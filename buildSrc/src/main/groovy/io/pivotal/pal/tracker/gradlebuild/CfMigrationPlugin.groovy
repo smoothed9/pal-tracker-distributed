@@ -24,7 +24,8 @@ class CfMigrationPlugin implements Plugin<Project> {
                         Thread.start {
                             tunnelProcess = "cf ssh -N -L 63306:${getMysqlHost(appName)}:3306 $appName".execute()
                         }
-                        sleep 5_000L
+
+                        waitUntilPortIsOpen(63306)
                     }
                 }
 
@@ -53,6 +54,21 @@ class CfMigrationPlugin implements Plugin<Project> {
 
     private def getMysqlHost = { cfAppName ->
         return getMysqlCredentials(cfAppName)["hostname"]
+    }
+
+    private def waitUntilPortIsOpen(int port) {
+        def notOpen = true
+        def attempts = 0
+
+        while (notOpen && attempts <= 50) {
+            try {
+                new Socket("localhost", port)
+                notOpen = false
+            } catch (IOException e) {
+                attempts += 1
+                Thread.sleep(200)
+            }
+        }
     }
 
     private static def buildFlywayExtension(Project project, String cfAppName) {
