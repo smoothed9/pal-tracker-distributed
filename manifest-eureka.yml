@@ -2,7 +2,7 @@ applications:
 - name: tracker-eureka
   path: ./platform-services/eureka-server/build/libs/eureka-server.jar
   host: eureka-pal-sm
-  memory: 1G
+  memory: 768M
   instances: 1
   services:
   - tracker-service-registry
